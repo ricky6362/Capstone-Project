@@ -1,12 +1,13 @@
 from flask import Flask, request, render_template, redirect, url_for, session
-from models import db, User, Asset, AssetAllocation, Request
+from flask_migrate import Migrate # import this
+from models import db, User
 
-app = Flask(__name__, template_folder='templates')  # Specify the 'templates' directory
+app = Flask(__name__)
 
-app.config['SECRET_KEY'] = 'your_secret_key'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///central_db.sqlite'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # Fixed the config key
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///asset-inventory.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
+migrate = Migrate(app, db) # import this also
 
 @app.route('/')
 def default_route():
@@ -48,9 +49,4 @@ def manager_dashboard():
         return redirect(url_for('login'))
 
 if __name__ == '__main__':
-    from models import create_tables
-
-    with app.app_context():
-        create_tables()
-    
     app.run(port=5555, debug=True)
